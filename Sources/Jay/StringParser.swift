@@ -165,7 +165,7 @@ struct StringParser: JsonParser {
         
         //nope, normal unicode char
         let char = UnicodeScalar(value)
-        return (char, reader)
+        return (char!, reader)
     }
     
     func fourBytesToUnicodeCode(_ last4: String) -> UInt16 {

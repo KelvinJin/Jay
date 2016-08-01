@@ -33,6 +33,10 @@ extension String {
         precondition(chars.count == 1)
         return chars.first!
     }
+    
+    mutating func append(_ scalar: UnicodeScalar) {
+        append(String(scalar))
+    }
 }
 
 extension Collection where Iterator.Element == UInt8 {

@@ -76,17 +76,8 @@ struct NativeTypeConverter {
         return try self.convertArray(array.map { $0 as Any })
     }
     
-    func parseNSDictionary(_ dict: NSDictionary) throws -> JSON? {
-        var dOut = [String: Any]()
-        for i in dict {
-            //for Linux reasons we must cast into CustomStringConvertible instead of String
-            //revert once bridging works.
-            // guard let key = i.key as? String else { throw Error.KeyIsNotString(i.key) }
-            guard let key = i.key as? CustomStringConvertible else { throw JayError.keyIsNotString(i.key) }
-            let value = i.value as Any
-            dOut[key.description] = value
-        }
-        return try self.dictionaryToJayType(dOut)
+    func parseNSDictionary(_ dict: [String: Any]) throws -> JSON? {
+        return try self.dictionaryToJayType(dict)
     }
     
     func arrayToJayType(_ maybeArray: Any) throws -> JSON? {
@@ -126,15 +117,15 @@ struct NativeTypeConverter {
         guard let json = js else { return .null }
         if json is NSNull { return .null }
 
-        if let nsdict = json as? NSDictionary {
+        if let nsdict = json as? [String: Any] {
             guard let dict = try self.parseNSDictionary(nsdict) else {
                 throw JayError.unsupportedType(nsdict)
             }
             return dict
         }
         
-        if let nsarray = json as? NSArray {
-            guard let array = try self.parseNSArray(nsarray) else {
+        if let nsarray = json as? [Any] {
+            guard let array = try self.convertArray(nsarray) else {
                 throw JayError.unsupportedType(nsarray)
             }
             return array
